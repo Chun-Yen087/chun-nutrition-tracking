@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nutrition Calculator</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Additional styles for better presentation */
+    .calculator-section {
+      margin-bottom: 20px;
+    }
+
+    .search-results {
+      margin-top: 10px;
+    }
+
+    #foodDetailsModal {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Nutrition Calculator</h1>
+
+    <!-- BMI Calculator Section -->
+    <div class="calculator-section">
+      <label for="weight">Weight (kg):</label>
+      <input type="number" id="weight" placeholder="Enter weight">
+
+      <label for="height">Height (cm):</label>
+      <input type="number" id="height" placeholder="Enter height">
+
+      <label for="age">Age:</label>
+      <input type="number" id="age" placeholder="Enter age">
+
+      <button onclick="calculateBMI()">Calculate BMI</button>
+
+      <p id="bmiResult"></p>
+    </div>
+
+    <hr>
+
+    <!-- TDEE Calculator Section -->
+    <div class="calculator-section">
+      <label for="activityLevel">Activity Level:</label>
+      <select id="activityLevel">
+        <option value="sedentary">Sedentary (little or no exercise)</option>
+        <option value="lightlyActive">Lightly Active (light exercise/sports 1-3 days/week)</option>
+        <option value="moderatelyActive">Moderately Active (moderate exercise/sports 3-5 days/week)</option>
+        <option value="veryActive">Very Active (hard exercise/sports 6-7 days a week)</option>
+        <option value="extraActive">Extra Active (very hard exercise/sports & physical job or 2x training)</option>
+      </select>
+
+      <button onclick="calculateTDEE()">Calculate TDEE</button>
+
+      <p id="tdeeResult"></p>
+    </div>
+
+    <hr>
+
+    <!-- Calories Comparison Section -->
+    <p id="caloriesComparison"></p>
+
+    <!-- Food Search Section -->
+    <h2>Food Search</h2>
+    <label for="searchInput">Search for specific food:</label>
+    <input type="text" id="searchInput" placeholder="Enter food name">
+    
+    <!-- Update the button to call the correct function -->
+    <button onclick="searchFoods()">Search</button>
+
+    <div id="searchResults" class="search-results"></div>
+
+    <!-- Food Details Modal -->
+    <div id="foodDetailsModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeFoodDetailsModal()">&times;</span>
+        <div id="foodDetails"></div>
+        <label for="foodCalories">Total Calories Consumed:</label>
+        <input type="number" id="foodCalories" value="0" placeholder="Enter total calories consumed">
+      </div>
+    </div>
+
+    <!-- Consumed Foods Section -->
+    <h3>Consumed Foods</h3>
+    <ul id="consumedFoodsList"></ul>
+
+    <!-- Remaining Calories Section -->
+    <div id="remainingCalories"></div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
