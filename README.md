@@ -1,15 +1,15 @@
 
-## Nutrition Calculator
+# Nutrition Calculator
 The Nutrition Calculator is a web application designed to assist users in tracking their nutritional intake and making informed decisions about their diet and exercise routine.
 
-# Features
+## Features
 BMI Calculator: Allows users to calculate their Body Mass Index (BMI) based on weight, height, and age inputs.
 TDEE Calculator: Provides users with an estimate of their Total Daily Energy Expenditure (TDEE) based on activity level.
 Food Search: Enables users to search for specific foods and retrieve nutritional information.
 Calories Comparison: Helps users compare consumed calories against their daily requirements.
 Consumed Foods Tracker: Tracks and displays a list of foods consumed by the user.
 Remaining Calories Display: Shows users the remaining calories they can consume based on their TDEE and the foods they've already consumed.
-# Technologies Used
+## Technologies Used
 HTML
 CSS
 JavaScript
