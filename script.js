@@ -73,13 +73,13 @@ function searchFoods() {
                 var remainingCalories = baseTDEE;
                 document.getElementById('searchResults').innerHTML = `No results found for the given query. You still need ${remainingCalories.toFixed(2)} calories for the day.`;
             }
-
-            
             openFoodDetailsModal();
+            
         })
         .catch(error => {
             console.error('Error fetching data from the food search API:', error);
         });
+        updateRemainingCalories();
 }
 
 function selectFood(fdcId) {
@@ -109,6 +109,7 @@ function selectFood(fdcId) {
 
             
             document.getElementById('foodDetailsModal').style.display = 'block';
+            
         })
         .catch(error => {
             console.error('Error fetching food details from the API:', error);
@@ -187,6 +188,8 @@ function addFoodToConsumption() {
 
         // Update the consumed foods display
         displayConsumedFoods();
+         
+        updateRemainingCalories();
 
         // Calculate and display remaining calories
         compareCalories();
@@ -196,6 +199,7 @@ function addFoodToConsumption() {
 
         // Close the food details modal
         closeFoodDetailsModal();
+
     }
 }
 
@@ -303,6 +307,7 @@ function compareCalories(baseTDEE) {
 
 
 updateCaloriesChart();
+
 var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 function updateCaloriesChart() {
