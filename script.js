@@ -279,7 +279,7 @@ function createDeleteHandler(index) {
         updateTotalCalories();
         
         // Calculate and display remaining calories
-        
+        compareCalories();
         
         // Update the chart with new data
         updateCaloriesChart();
