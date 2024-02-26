@@ -109,4 +109,8 @@ body {
   li:hover {
     background-color: #f9f9f9;
   }
-  
+  .delete-button{
+    width:5px;
+    font-size:5px;
+    height:2px;
+  }

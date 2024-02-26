@@ -16,6 +16,12 @@ function calculateTDEE() {
     var tdee = calculateTDEEByActivityLevel(weight,height,age, activityLevel);
 
     document.getElementById('tdeeResult').innerHTML = 'Your TDEE: ' + tdee + ' calories';
+    updateRemainingCalories();
+
+    document.getElementById('activityLevel').addEventListener('change', function() {
+        // Calculate TDEE again when activity level changes
+        calculateTDEE();
+    });
 }
 
 function calculateTDEEByActivityLevel(weight,height,age, activityLevel) {
@@ -51,18 +57,14 @@ function searchFoods() {
             return response.json();
         })
         .then(data => {
-            console.log('API Response:', data); // Log the response data
+            console.log('API Response:', data); 
 
             if (data.foods && data.foods.length > 0) {
                 var searchResults = data.foods.map(food => {
-                    // Find the index of the "Energy" nutrient in the foodNutrients array
                     var energyIndex = food.foodNutrients.findIndex(nutrient => nutrient.nutrientName.toLowerCase().includes('energy'));
-
-                    // Use the found index or provide a default value if not found
                     var energyValue = energyIndex !== -1 ? food.foodNutrients[energyIndex].value : 'N/A';
 
-                    // Updated the onclick event to call the selectFood function
-                    return `<div onclick="selectFood(${food.fdcId})">${food.description} - ${energyValue} calories</div>`;
+                    return `<div onclick="selectFood(${food.fdcId})">${food.description}</div>`;
                 });
 
                 document.getElementById('searchResults').innerHTML = 'Search Results:<br>' + searchResults.join('<br>');
@@ -72,7 +74,7 @@ function searchFoods() {
                 document.getElementById('searchResults').innerHTML = `No results found for the given query. You still need ${remainingCalories.toFixed(2)} calories for the day.`;
             }
 
-            // Open the food details modal when search results are displayed
+            
             openFoodDetailsModal();
         })
         .catch(error => {
@@ -93,14 +95,8 @@ function selectFood(fdcId) {
         })
         .then(foodData => {
             console.log('Selected Food Details:', foodData);
-
-            // Store the selected food data
             selectedFoodData = foodData;
-
-            // Find the calories and other relevant details dynamically
             var caloriesInfo = findNutrientInfo(selectedFoodData);
-
-            // Display the selected food details in the foodDetails div
             var foodDetailsHTML = `
             <h2>${foodData.description}</h2>
                 <p>${caloriesInfo.label}: ${caloriesInfo.value} ${caloriesInfo.unit}</p>
@@ -111,7 +107,7 @@ function selectFood(fdcId) {
             `;
             document.getElementById('foodDetails').innerHTML = foodDetailsHTML;
 
-            // Show the food details modal
+            
             document.getElementById('foodDetailsModal').style.display = 'block';
         })
         .catch(error => {
@@ -127,20 +123,17 @@ function findNutrientInfo(foodData) {
         unit: 'N/A'
     };
 
-    // Check if foodNutrients is present and has at least one element
+    
     if (foodData.foodNutrients && foodData.foodNutrients.length > 0) {
-        // Loop through foodNutrients to find the nutrient with the desired label ('Energy')
         for (var nutrient of foodData.foodNutrients) {
             console.log('Checking Nutrient:', nutrient);
 
-            // Check for the correct nutrient (considering variations in name and case)
             if (nutrient.nutrient.number == "208") {
                 console.log('Found Matching Nutrient:', nutrient);
                 nutrientInfo.label=nutrient.nutrient.name;
-                // Update the value and unit with the correct properties
                 nutrientInfo.value = nutrient.amount;
                 nutrientInfo.unit = nutrient.nutrient.unitName;
-                break; // Exit the loop once the nutrient is found
+                break; 
             }
         }
     }
@@ -153,51 +146,53 @@ function findNutrientInfo(foodData) {
 
 
 
-// Function to calculate calories based on portion size
+
 function calculateCaloriesForPortionSize(portion, calories) {
     if (portion.gramWeight) {
-        // Assuming 'calories' are per 100 grams, adjust based on portion size
         return (calories * portion.amount) ;
     } else {
-        return calories; // No portion size information, keep the original value
+        return calories; 
     }
 }
- // Add this line outside any function to initialize the variable
+ 
  var totalConsumedCalories = 0; 
 
  
-var consumedFoods = []; // Assuming you have this array defined globally
+var consumedFoods = []; 
 
 
 function addFoodToConsumption() {
     if (selectedFoodData) {
         var nutrientInfo = findNutrientInfo(selectedFoodData);
         var consumedCalories = parseFloat(nutrientInfo.value) || 0;
-        
-        // Access the portion size from selectedFoodData (update this according to your actual data structure)
         var portionSize = parseFloat(document.getElementById('portionSize').value) || 1;
-
-        // Calculate total consumed calories with portion size
         var totalCaloriesWithPortion = calculateCaloriesForPortionSize({amount: portionSize}, consumedCalories);
+        var existingFoodIndex = consumedFoods.findIndex(food => food.description === selectedFoodData.description);
 
-        // Update the total consumed calories
-        totalConsumedCalories += totalCaloriesWithPortion;
+        if (existingFoodIndex !== -1) {
+            consumedFoods[existingFoodIndex].calories += totalCaloriesWithPortion;
+            consumedFoods[existingFoodIndex].portionSize += portionSize;
+        } else {
+            consumedFoods.push({
+                description: selectedFoodData.description,
+                calories: totalCaloriesWithPortion,
+                portionSize: portionSize
+            });
+        }
 
-        // Push the selected food data into the consumedFoods array with portion size
-        consumedFoods.push({
-            description: selectedFoodData.description,
-            calories: totalCaloriesWithPortion,
-            portionSize: portionSize
-        });
+        totalConsumedCalories += totalCaloriesWithPortion * portionSize;
 
-        // Display the total consumed calories directly in the HTML
+        // Update the total consumed calories display
         updateTotalCalories();
 
-        // Display the consumed foods
+        // Update the consumed foods display
         displayConsumedFoods();
 
         // Calculate and display remaining calories
         compareCalories();
+
+        // Update the chart with new data
+        updateCaloriesChart();
 
         // Close the food details modal
         closeFoodDetailsModal();
@@ -205,11 +200,11 @@ function addFoodToConsumption() {
 }
 
 
+
 function openFoodDetailsModal() {
     document.getElementById('foodDetailsModal').style.display = 'block';
 }
 
-// Function to close the food details modal
 function closeFoodDetailsModal() {
     document.getElementById('foodDetailsModal').style.display = 'none';
 }
@@ -226,36 +221,135 @@ function compareCalories(baseTDEE) {
 }
 
 function updateTotalCalories() {
-    document.getElementById('foodCalories').value = totalConsumedCalories.toFixed(2);
+    var totalCalories = consumedFoods.reduce(function(total, food) {
+        return total + (food.calories * food.portionSize);
+    }, 0);
+
+    document.getElementById('foodCalories').value = totalCalories.toFixed(2);
 }
+
+
 function displayConsumedFoods() {
     var consumedFoodsListElement = document.getElementById('consumedFoodsList');
-
-    // Clear the existing content
     consumedFoodsListElement.innerHTML = '';
 
-    // Loop through the consumedFoods array and create a list of consumed foods
     for (var i = 0; i < consumedFoods.length; i++) {
         var foodItem = consumedFoods[i];
-
-        // Create a list item for each consumed food
         var listItem = document.createElement('li');
-        listItem.textContent = `${foodItem.description} - ${foodItem.calories*foodItem.portionSize} calories (Portion Size: ${foodItem.portionSize})`;
 
-        // Append the list item to the consumedFoodsListElement
-        consumedFoodsListElement.appendChild(listItem);
+        
+        var listItemContainer = document.createElement('div');
+        listItemContainer.classList.add('food-item-container');
+
+        
+        listItem.textContent = `${foodItem.description} - ${foodItem.calories * foodItem.portionSize} calories (Portion Size: ${foodItem.portionSize})`;
+
+        
+        var deleteButton = document.createElement('button');
+        deleteButton.textContent = '-';
+        deleteButton.classList.add('delete-button');
+
+        
+        deleteButton.addEventListener('click', createDeleteHandler(i));
+
+        listItemContainer.appendChild(listItem);
+        listItemContainer.appendChild(deleteButton);
+
+        
+        consumedFoodsListElement.appendChild(listItemContainer);
     }
 }
+
+
+function createDeleteHandler(index) {
+    return function() {
+        // Calculate the calories of the deleted item
+        var deletedItemCalories = consumedFoods[index].calories * consumedFoods[index].portionSize;
+        
+        // Remove the food item from the consumedFoods array
+        consumedFoods.splice(index, 1);
+        
+        // Update the display of consumed foods
+        displayConsumedFoods();
+        
+        // Recalculate total consumed calories
+        totalConsumedCalories -= deletedItemCalories;
+        
+        // Update the total consumed calories display
+        updateTotalCalories();
+        
+        // Calculate and display remaining calories
+        
+        
+        // Update the chart with new data
+        updateCaloriesChart();
+    };
+}
+
+
 function compareCalories(baseTDEE) {
     var remainingCaloriesElement = document.getElementById('remainingCalories');
 
     if (remainingCaloriesElement !== null) {
-        var remainingCalories = baseTDEE - totalConsumedCalories;
+        baseTDEE = baseTDEE || 0;
 
+        var remainingCalories = baseTDEE - totalConsumedCalories;
+        
         remainingCaloriesElement.innerHTML = 'Remaining Calories: ' + remainingCalories.toFixed(2);
     } else {
         console.error('The element with ID "remainingCalories" not found.');
     }
 }
 
-  
+
+updateCaloriesChart();
+var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+function updateCaloriesChart() {
+    var svg = d3.select("#caloriesChart");
+    svg.selectAll("*").remove();
+
+    var width = +svg.attr("width");
+    var height = +svg.attr("height");
+    var radius = Math.min(width, height) / 2;
+
+    var g = svg.append("g")
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+    var data = consumedFoods.map(function (d) {
+        return {
+            description: d.description,
+            calories: d.calories * d.portionSize
+        };
+    });
+
+    var color = d3.scaleOrdinal()
+        .domain(data.map(function(d) { return d.description; }))
+        .range(["#4CAF50", "#FFC107", "#2196F3", "#FF5722", "#9C27B0", "#795548", "#00BCD4", "#FFEB3B", "#9E9E9E", "#FF9800"]);
+
+    var pie = d3.pie()
+        .value(function (d) { return d.calories; })
+        .sort(null);
+
+    var arc = d3.arc()
+        .innerRadius(0)
+        .outerRadius(radius);
+
+    var arcs = g.selectAll(".arc")
+        .data(pie(data))
+        .enter().append("g")
+        .attr("class", "arc");
+
+    arcs.append("path")
+        .attr("d", arc)
+        .attr("fill", function (d) { return color(d.data.description); });
+
+    arcs.append("text")
+        .attr("transform", function (d) { return "translate(" + arc.centroid(d) + ")"; })
+        .attr("dy", "0.35em")
+        .text(function (d) { return d.data.description; });
+}
+function updateRemainingCalories() {
+    var baseTDEE = parseFloat(document.getElementById('tdeeResult').innerText.split(' ')[2]);
+    compareCalories(baseTDEE);
+}

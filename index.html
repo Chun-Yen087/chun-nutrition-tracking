@@ -6,7 +6,7 @@
   <title>Nutrition Calculator</title>
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* Additional styles for better presentation */
+    
     .calculator-section {
       margin-bottom: 20px;
     }
@@ -24,7 +24,7 @@
   <div class="container">
     <h1>Nutrition Calculator</h1>
 
-    <!-- BMI Calculator Section -->
+    
     <div class="calculator-section">
       <label for="weight">Weight (kg):</label>
       <input type="number" id="weight" placeholder="Enter weight">
@@ -42,7 +42,7 @@
 
     <hr>
 
-    <!-- TDEE Calculator Section -->
+
     <div class="calculator-section">
       <label for="activityLevel">Activity Level:</label>
       <select id="activityLevel">
@@ -60,20 +60,20 @@
 
     <hr>
 
-    <!-- Calories Comparison Section -->
+  
     <p id="caloriesComparison"></p>
 
-    <!-- Food Search Section -->
+    
     <h2>Food Search</h2>
     <label for="searchInput">Search for specific food:</label>
     <input type="text" id="searchInput" placeholder="Enter food name">
     
-    <!-- Update the button to call the correct function -->
+    
     <button onclick="searchFoods()">Search</button>
 
     <div id="searchResults" class="search-results"></div>
 
-    <!-- Food Details Modal -->
+    
     <div id="foodDetailsModal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeFoodDetailsModal()">&times;</span>
@@ -83,15 +83,20 @@
       </div>
     </div>
 
-    <!-- Consumed Foods Section -->
+    
     <h3>Consumed Foods</h3>
     <ul id="consumedFoodsList"></ul>
 
-    <!-- Remaining Calories Section -->
+    
     <div id="remainingCalories"></div>
-
+    
+    <div id="foodChart">
+      <svg id="caloriesChart" width="400" height="200"></svg>
+    </div>
   </div>
-
+  
   <script src="script.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  
 </body>
 </html>
